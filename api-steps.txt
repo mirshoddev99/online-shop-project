@@ -1,0 +1,17 @@
+                                        User authentication system
+1) Creating serializers for user model
+2) Set up JWT (access & refresh) token and adding token method to the User model
+3) Create UserConfirmation model for generating confirmation code and verify a signed-up user
+4) In the UserConfirmation model, generating verification code using to verify user
+5)
+
+
+
+    Steps
+1 - SignUp  (DONE)
+2 - Confirm User    (DONE)
+3 - Login
+4 - UserChange Information
+5 - Change, Reset Password
+6 - Logout
+

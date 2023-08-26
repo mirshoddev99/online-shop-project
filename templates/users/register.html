@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Register Page{% endblock title %}
+
+{% block content %}
+<br><br>
+ <div class="container">
+
+    <form class="well form-horizontal" action="{% url 'register_page' %}" method="post"  id="contact_form">
+      {% csrf_token %}
+<fieldset>
+
+<!-- Form Name -->
+  <br><br><br><br>
+<h2><b>Registration Form</b></h2>
+  <br><br><br>
+
+  <!-- Text input-->
+
+<div class="form-group">
+  <label class="col-md-4 control-label">Username</label>
+  <div class="col-md-4 inputGroupContainer">
+  <div class="input-group">
+  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+  <input  name="username" placeholder="Username" class="form-control"  type="text" required>
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+
+<div class="form-group">
+  <label class="col-md-4 control-label">First Name</label>
+  <div class="col-md-4 inputGroupContainer">
+  <div class="input-group">
+  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+  <input  name="first_name" placeholder="First Name" class="form-control"  type="text" required>
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+
+<div class="form-group">
+  <label class="col-md-4 control-label" >Last Name</label>
+    <div class="col-md-4 inputGroupContainer">
+    <div class="input-group">
+  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+  <input name="last_name" placeholder="Last Name" class="form-control"  type="text" required>
+    </div>
+  </div>
+</div>
+
+  <div class="form-group">
+  <label class="col-md-4 control-label">Seller / Customer</label>
+    <div class="col-md-4 selectContainer">
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
+    <select name="seller_or_customer" class="form-control selectpicker" required>
+      <option value="">Select your Seller/Customer</option>
+      <option name="seller">Seller</option>
+      <option name="customer">Customer</option>
+    </select>
+  </div>
+</div>
+</div>
+
+
+<!-- Text input-->
+
+<div class="form-group">
+  <label class="col-md-4 control-label" >Password</label>
+    <div class="col-md-4 inputGroupContainer">
+    <div class="input-group">
+  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+  <input name="password" placeholder="Password" class="form-control"  type="password" required>
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+
+<div class="form-group">
+  <label class="col-md-4 control-label" >Confirm Password</label>
+    <div class="col-md-4 inputGroupContainer">
+    <div class="input-group">
+  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+  <input name="confirm_password" placeholder="Confirm Password" class="form-control"  type="password" required>
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+       <div class="form-group">
+  <label class="col-md-4 control-label">E-Mail</label>
+    <div class="col-md-4 inputGroupContainer">
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+  <input name="email" placeholder="E-Mail Address" class="form-control"  type="email" required>
+    </div>
+  </div>
+</div>
+
+
+<!-- Select Basic -->
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label"></label>
+  <div class="col-md-4"><br>
+    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<button type="submit" class="btn btn-warning" >&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspSUBMIT <span class="glyphicon glyphicon-send"></span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</button>
+    <br><br>
+  </div>
+</div>
+
+</fieldset>
+</form>
+</div>
+   <script src="{% static 'js/script.js' %}"></script>
+
+{% endblock content %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Register Page{% endblock title %}
+
+{% block content %}
+<br><br>
+<div class="container">
+  <div class="row">
+  <h2>Register</h2>
+    <br><br>
+    <div class="col-12">
+      <form action="{% url 'test_register_page' %}" method="post">
+      {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <br><br>
+      </form>
+  </div>
+
+  </div>
+</div>
+{% endblock content %}

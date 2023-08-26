@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}
+  Profile
+{% endblock title %}
+
+{% block content %}
+
+<section class="vh-100" style="background-color: #f4f5f7;">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col col-lg-6 mb-4 mb-lg-0">
+        <div class="card mb-3" style="border-radius: .5rem;">
+          <div class="row g-0">
+            <div class="col-md-4 gradient-custom text-center text-white"
+              style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+              <img src="{{ user.avatar.url }}"
+                alt="Avatar" class="img-fluid my-4" style="width: 80px;" />
+              <h5>{{ profile.username }}</h5><br>
+              <p>{{ profile.seller_or_customer }}</p>
+              <a href="{% url 'edit_profile_page' %}"><i class="fas fa-edit mb-2 mr-2 mt-3"></i></a>
+              <a href="{% url 'address_page' %}"><i class="fas fa-home mb-2 mt-3"></i></a>
+            </div>
+            <div class="col-md-8">
+              <div class="card-body p-4">
+                <h5>Profile</h5>
+                <hr class="mt-0 mb-4">
+                <div class="row pt-1">
+                  <div class="col-6 mb-3">
+                    <h6>Email</h6>
+                    <p class="text-muted">{{ profile.email }}</p>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <h6>Phone</h6>
+                    <p class="text-muted">{{ profile.phone }}</p>
+                  </div>
+
+                  <div class="col-6 mb-3">
+                    <h6>First Name</h6>
+                    <p class="text-muted">{{ profile.first_name }}</p>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <h6>Last Name</h6>
+                    <p class="text-muted">{{ profile.last_name }}</p>
+                  </div>
+                </div>
+                <h5 class="pt-2">Social networks</h5>
+                <hr class="mt-0 mb-4">
+                <div class="d-flex justify-content-start">
+                  <a href="#!"><i class="fab fa-facebook-f fa-lg me-3"></i></a>
+                  <a href="https://t.me/Umaroff007/"><i class="fab fa-telegram fa-lg me-3"></i></a>
+                  <a href="https://www.instagram.com/mirshod_99/"><i class="fab fa-instagram fa-lg"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

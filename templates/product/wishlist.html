@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load custom_template_tags %}
+{% load static %}
+<title>{% block title %}Wishlist{% endblock title %}</title>
+
+{% block content %}
+
+	<div class="bg0 m-t-23 p-b-140">
+		<div class="container">
+			<hr>
+			<div class="p-b-10">
+				{% if wishlist_products %}
+				<h3 class="ltext-103 cl5">
+					Your WishList
+				</h3>
+				{% else %}
+				<h3 class="ltext-103 cl5">
+					Your WishList is empty
+				</h3>
+				{% endif %}
+			</div>
+			<br><br><br>
+			<div class="row isotope-grid">
+				{% for item in wishlist_products %}
+				<div class="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item women">
+					<!-- Block2 -->
+					<div class="block2">
+						{% with available_image=item.product.images.all|first_available_image %}
+						{% if available_image %}
+						<div class="block2-pic hov-img0">
+							<img src="{{ item.product.images.first.image.url }}" alt="Product Image">
+							<a href="{% url 'product_detail_page' item.product.slug %}" class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04 js-addcart-detail">
+								View
+							</a>
+						</div>
+						{% endif %}
+						{% endwith %}
+
+						<div class="block2-txt flex-w flex-t p-t-14">
+							<div class="block2-txt-child1 flex-col-l ">
+								<a href="{% url 'product_detail_page' item.product.slug %}" class="stext-104 cl4 hov-cl1 trans-04 js-name-b2 p-b-6">
+									{{ item.product.name }}
+								</a>
+
+								<span class="stext-105 cl3">
+									${{ item.product.price }}
+								</span>
+							</div>
+
+                            <div class="cart-body">
+							  <a href="{% url 'adding_product_cart_page' item.product.get_slug %}"><i class="fas fa-shopping-cart mr-3 mt-2"></i></a>
+							  <a href="{% url 'delete_wishlist_product' item.product.get_slug %}"><i class="fas fa-trash mt-2"></i></a>
+                            </div>
+
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+        </div>
+    </div>
+{% endblock content %}

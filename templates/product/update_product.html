@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}
+  Update-Product
+{% endblock title %}
+
+{% block content %}
+<br><br>
+<br><br>
+
+  <div class="container">
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-6 mt-5 ">
+            <h2>Update Product</h2>
+            <br><br>
+            <form  action="{% url 'updating_product_page' product.slug %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ update_product_form.as_p }}
+                <br>
+                {{ formset.management_form }}
+                {% for img in formset %}
+                    {{ img.as_p }}
+                {% endfor %}
+                <br>
+                <button type="submit" class="btn btn-primary" >Submit</button>
+                <a href="{% url 'home_page' %}" class="btn btn-secondary">Back</a>
+                <br><br>
+            </form>
+        </div>
+        <div class="col"></div>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,10 @@
+login: admin99
+password: mirshod@99!
+
+TestUser
+username: testuser123
+password: testuser99
+
+TestUser
+username: madichka
+password: madina96

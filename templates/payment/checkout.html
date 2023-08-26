@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}s
+  Billing Address
+{% endblock title %}
+
+{% block content %}
+<style>
+  .my-row {
+  display: -ms-flexbox; /* IE10 */
+  display: flex;
+  -ms-flex-wrap: wrap; /* IE10 */
+  flex-wrap: wrap;
+  margin: 0 -16px;
+}
+
+.col-25 {
+  -ms-flex: 25%; /* IE10 */
+  flex: 25%;
+}
+
+.col-50 {
+  -ms-flex: 50%; /* IE10 */
+  flex: 50%;
+}
+
+.col-75 {
+  -ms-flex: 75%; /* IE10 */
+  flex: 75%;
+}
+
+.col-25,
+.col-50,
+.col-75 {
+  padding: 0 16px;
+}
+
+.my-container {
+  background-color: #f2f2f2;
+  padding: 5px 20px 15px 20px;
+  border: 1px solid lightgrey;
+  border-radius: 3px;
+}
+
+input[type=text] {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+label {
+  margin-bottom: 10px;
+  display: block;
+}
+
+.icon-container {
+  margin-bottom: 20px;
+  padding: 7px 0;
+  font-size: 24px;
+}
+
+.btn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  width: 100%;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.btn:hover {
+  background-color: #45a049;
+}
+
+span.price {
+  float: right;
+  color: grey;
+}
+
+/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other (and change the direction - make the "cart" column go on top) */
+@media (max-width: 800px) {
+  .row {
+    flex-direction: column-reverse;
+  }
+  .col-25 {
+    margin-bottom: 20px;
+  }
+}
+
+</style>
+<br>
+<div class="my-row ml-2 mb-5 pt-3">
+  <div class="col-75">
+    <!--   form    -->
+    <form action="{% url 'checkout_page' %}" method="post">
+      {% csrf_token %}
+    <div class="my-container">
+
+        <div class="row">
+          <div class="col-50">
+            <h3 class="pt-4 mb-2">Billing Address</h3>
+            <label for="fname"><i class="fa fa-user"></i> Username</label>
+            <input type="text" id="fname" name="firstname" value="{{ address.customer.username }}" readonly>
+            <label for="email"><i class="fa fa-envelope"></i> Email</label>
+            <input type="text" id="email" name="email" value="{{ address.customer.email }}" readonly>
+            <label for="adr"><i class="fa fa-address-card-o"></i> Address</label>
+            <input type="text" id="adr" name="address" readonly value="{{ address.street }} Street">
+            <label for="city"><i class="fa fa-institution"></i> City</label>
+            <input type="text" id="city" name="city"  readonly value="{{ address.city }} City">
+
+            <div class="row">
+              <div class="col-50">
+                <label for="state">Country</label>
+                <input type="text" id="state" name="state" value="{{ address.country }} Country" readonly>
+              </div>
+              <div class="col-50">
+                <label for="zip">Zip</label>
+                <input type="text" id="zip" name="zip" value="{{ address.zipcode }}" readonly>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="col-50">
+            <h3 class="pt-4 mb-2">Payment</h3>
+            <label for="fname">Accepted Cards</label>
+            <div class="icon-container">
+              <i class="fa fa-cc-visa" style="color:navy;"></i>
+              <i class="fa fa-cc-amex" style="color:blue;"></i>
+              <i class="fa fa-cc-mastercard" style="color:red;"></i>
+              <i class="fa fa-cc-discover" style="color:orange;"></i>
+            </div>
+            <label for="cname">Name on Card</label>
+            <input type="text" id="cname" value="John Doe" name="holder_name" required>
+            <label for="ccnum">Credit card number</label>
+            <input type="text" id="ccnum" value="1234 4444 5555 6512" name="card_number" required>
+            <label for="expmonth">Exp Month</label>
+            <input type="text" id="expmonth" value="11" name="expire_month" required>
+
+            <div class="row">
+              <div class="col-50">
+                <label for="expyear">Exp Year</label>
+                <input type="text" id="expyear" value="2022" name="expire_year" required>
+              </div>
+              <div class="col-50">
+                <label for="cvv">CVV</label>
+                <input type="text" id="cvv" value="538" name="cvv" required>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <label>
+          <input type="checkbox" checked="checked" name="shipping_address"> Shipping address same as billing
+        </label>
+        <a href="{% url 'shopping_cart_page' %}" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-secondary">Continue checkout</button>
+    </div>
+  </form>
+  </div>
+
+
+  <div class="col-25">
+    <div class="container">
+      <h4>Cart products
+        <span class="price" style="color:black">
+          <a href="{% url 'shopping_cart_page' %}" style="color: inherit;"><i class="fa fa-shopping-cart"></i></a>
+          <b>{{ cart_products.count }}</b>
+        </span>
+      </h4><br><br>
+      {% for product in cart_products %}
+      <div class="mb-4">
+        <p><a href="#">{{ product.product.name|truncatewords:5 }}</a> <span class="price">$<b>{{ product.get_total_price }}</b></span></p>
+      </div>
+      {% endfor %}
+      <hr>
+      <p>Total cost <span class="price" style="color:black"><b>${{ total_cost }}</b></span></p>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+
