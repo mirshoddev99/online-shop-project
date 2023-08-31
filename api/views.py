@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.serializers import CustomUserSerializer, SignUpSerializer
+from users.email import sending_code
 from users.models import CustomUser, NEW, CODE_VERIFIED
 
 
@@ -42,3 +43,22 @@ class VerifyUserAPIView(APIView):
             user.auth_status = CODE_VERIFIED
             user.save()
         return True
+
+
+class GetNewVerification(APIView):
+    permission_classes = [permissions.AllowAny, ]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if user.verify_codes.filter(expiration_time__gt=datetime.now(), is_confirmed=False).exists():
+            raise ValidationError("Your verification code is still valid to user!")
+        else:
+            code = user.create_verify_code()
+            sending_code(user.email, code)
+            data = {
+                "success": True, "message": "New verification code has been sent",
+                "access": user.token()['access'],
+                "refresh": user.token()['refresh_token']
+            }
+            return Response(data)
+
