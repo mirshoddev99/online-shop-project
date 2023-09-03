@@ -83,6 +83,13 @@ class ProductCart(models.Model):
     def get_total_price(self):
         return self.quantity * self.product.get_price()
 
+    @staticmethod
+    def get_final_price():
+        final_price = 0
+        for pr in ProductCart.objects.all():
+            final_price += pr.get_total_price()
+        return final_price
+
 
 class WishList(models.Model):
     owner = models.ForeignKey(CustomUser, related_name="my_wishlist", on_delete=models.CASCADE)

@@ -1,9 +1,17 @@
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import update_last_login
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.generics import get_object_or_404
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
+from rest_framework_simplejwt.tokens import AccessToken
 
+from api.custom_methods import get_user
 from users.email import sending_code
-from users.models import CustomUser
+from users.models import CustomUser, CODE_VERIFIED
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -70,3 +78,94 @@ class SignUpSerializer(serializers.ModelSerializer):
         data['message'] = 'You have successfully signed up!'
         data.update(instance.token())
         return data
+
+
+class ChangeUserInfoSerializer(serializers.Serializer):
+    first_name = serializers.CharField(write_only=True, required=False)
+    last_name = serializers.CharField(write_only=True, required=False)
+    email = serializers.CharField(write_only=True, required=False)
+    phone = serializers.CharField(write_only=True, required=False)
+    birth_date = serializers.CharField(write_only=True, required=False)
+
+    @staticmethod
+    def validate_email(email):
+        if CustomUser.objects.filter(email=email).exists():
+            raise ValidationError("This email already in use! ")
+        return email
+
+    @staticmethod
+    def validate_birth_date(birth_date):
+        if len(birth_date) < 10 or len(birth_date) > 10:
+            raise ValidationError("The birth date length should be 10 characters!")
+        return birth_date
+
+    def update(self, instance, validated_data):
+        instance.first_name = validated_data.get("first_name", instance.first_name)
+        instance.last_name = validated_data.get("last_name", instance.last_name)
+        instance.email = validated_data.get("email", instance.email)
+        instance.phone = validated_data.get("phone", instance.phone)
+        instance.birth_date = validated_data.get("birth_date", instance.birth_date)
+        instance.save()
+        return instance
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['success'] = True
+        data['auth_status'] = instance.auth_status
+        data['message'] = 'Successfully updated!'
+        if instance.full_name != "":
+            data["full_name"] = instance.full_name
+        return data
+
+
+class UserLoginSerializer(TokenObtainPairSerializer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = None
+        self.fields['username'] = serializers.CharField(write_only=True, required=True)
+        self.fields['password'] = serializers.CharField(write_only=True, required=True)
+
+    def validate(self, data):
+        self.auth_validate(data)
+        print(data)
+        if self.user.auth_status != CODE_VERIFIED:
+            raise PermissionDenied("You can not log in because of you have no permission!")
+        data = self.user.token()
+        data["auth_status"] = self.user.auth_status
+        data["success"] = True
+        data["message"] = "You have successfully logged in!"
+        if self.user.full_name != "":
+            data["full_name"] = self.user.full_name
+        return data
+
+    def auth_validate(self, data):
+        authentication_kwargs = {
+            self.username_field: data['username'],
+            "password": data["password"]
+        }
+        user = authenticate(**authentication_kwargs)
+        print("User - ", user)
+        print(data)
+        if user is not None:
+            self.user = user
+        else:
+            raise ValidationError({
+                "success": False,
+                "message": "Sorry, password or username you entered is incorrect. Please check it out and try again!"
+            })
+
+
+class UserLoginRefreshSerializeR(TokenRefreshSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        access_token_instance = AccessToken(data['access'])
+        user_id = access_token_instance['user_id']
+        user = get_object_or_404(CustomUser, id=user_id)
+        update_last_login(None, user)
+        data['success'] = True
+        data['message'] = "Your access token has been updated!"
+        return data
+
+
+class UserLogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()

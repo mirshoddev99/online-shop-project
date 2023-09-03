@@ -209,12 +209,16 @@ class SubcategoryListView(ListView):
 
 
 # ProductCart Logic
-class DisplayingShoppingCart(View):
+class DisplayingShoppingCart(LoginRequiredMixin, View):
     def get(self, request):
         cart_products = ProductCart.objects.all().filter(owner__pk=request.user.pk)
-        total_cost = get_total_cost_in_cart(request)
-        contex = {"cart_products": cart_products, "total_cost": total_cost}
-        return render(request, "product/shopping_cart.html", contex)
+        if cart_products.exists():
+            total_cost = ProductCart.get_final_price()
+            contex = {"cart_products": cart_products, "total_cost": total_cost}
+            return render(request, "product/shopping_cart.html", contex)
+        else:
+            messages.warning(request, "Your shopping cart is empty!")
+            return redirect("products_page")
 
 
 class AddingCartProductView(LoginRequiredMixin, View):
@@ -240,7 +244,7 @@ class AddingCartProductView(LoginRequiredMixin, View):
                     return redirect("shopping_cart_page")
                 else:
                     messages.warning(request, "You have bought all of these products in stock!")
-                    return redirect("shopping_cart_page")
+                    return redirect("products_page")
             except Http404:
                 ProductCart.objects.create(owner=request.user, product=product)
                 product.quantity -= 1
@@ -252,7 +256,7 @@ class AddingCartProductView(LoginRequiredMixin, View):
                     product.save()
                 messages.success(request, "Product has been added to your cart!")
                 print(f"this product is not available in your cart, so added first time - ", product)
-                return redirect("shopping_cart_page")
+                return redirect("products_page")
         except Http404:
             messages.warning(request, "You have bought all of these products in stock!")
             return redirect("shopping_cart_page")
@@ -268,11 +272,11 @@ class DeletingCartProductView(View):
             cart_product.quantity -= 1
             if not cart_product.product.in_active:
                 cart_product.product.in_active = True
+            cart_product.product.save()
+            cart_product.save()
             if cart_product.quantity == 0:
                 cart_product.delete()
                 messages.success(request, "Product has been removed from your cart!")
-            cart_product.product.save()
-            cart_product.save()
             return redirect("shopping_cart_page") if ProductCart.get_total_products() else redirect("products_page")
 
 

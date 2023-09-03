@@ -7,11 +7,23 @@
 
 
 
-    Steps
+    Steps for Users app
 1 - SignUp  (DONE)
-2 - Confirm User    (DONE)
-3 - Login
-4 - UserChange Information
-5 - Change, Reset Password
-6 - Logout
+2 - Verify User    (DONE)
+3 - ChangeUser information  (DONE)
+4 - Login   (DONE)
+5 - LoginRefresh (DONE)
+6 - Change, Reset Password  (SKIP)
+7 - Logout  (DONE)
 
+
+    Steps for Product app
+1 - List of products    (DONE)
+2 - List of category and subcategory products   (DONE)
+3 - Detail product
+4 - CRUD operation with product -  if user is a seller
+5 - Display and CRUD operation with PRODUCT CART -  if user is authenticated
+6 - Display and CRUD operation with WISHLIST -  if user is authenticated    (DONE)
+7 - Product comment
+8 - Displaying SELLER PRODUCT LIST
+9 -
