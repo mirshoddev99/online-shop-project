@@ -4,7 +4,7 @@ from product_app.models import Product, Category, ProductCart, ProductComment, P
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'quantity', 'in_active', 'created_at']
+    list_display = ['id', 'name', 'quantity', 'in_active', 'created_at']
     list_filter = ["id", 'name', 'created_at', 'size']
     search_fields = ['name', 'id', 'created_at']
     prepopulated_fields = {'slug': ('name',)}

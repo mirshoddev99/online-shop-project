@@ -1,11 +1,3 @@
-                                        User authentication system
-1) Creating serializers for user model
-2) Set up JWT (access & refresh) token and adding token method to the User model
-3) Create UserConfirmation model for generating confirmation code and verify a signed-up user
-4) In the UserConfirmation model, generating verification code using to verify user
-5)
-
-
 
     Steps for Users app
 1 - SignUp  (DONE)
@@ -20,10 +12,10 @@
     Steps for Product app
 1 - List of products    (DONE)
 2 - List of category and subcategory products   (DONE)
-3 - Detail product
-4 - CRUD operation with product -  if user is a seller
-5 - Display and CRUD operation with PRODUCT CART -  if user is authenticated
-6 - Display and CRUD operation with WISHLIST -  if user is authenticated    (DONE)
-7 - Product comment
-8 - Displaying SELLER PRODUCT LIST
+3 - Detail product  (DONE)
+4 - CRUD operation with product -  if a user is a seller
+5 - Display and CRUD operation with PRODUCT CART -  if a user is authenticated    (DONE)
+6 - Display and CRUD operation with WISHLIST -  if a user is authenticated    (DONE)
+7 - Product comment (DONE)
+8 - Displaying SELLER PRODUCT LIST  (DONE)
 9 -

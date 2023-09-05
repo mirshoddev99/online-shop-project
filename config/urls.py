@@ -8,9 +8,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('product_app.urls')),
     path('users/', include('users.urls')),
-    path('api/', include('api.urls')),
+    path('api/', include('api.user_urls')),
+    path('api/', include('api.product_urls')),
     path('paypal/', include("paypal.standard.ipn.urls")),
-
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

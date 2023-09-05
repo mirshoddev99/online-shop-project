@@ -143,8 +143,8 @@ class UpdateProductView(View):
 
 class DeleteProductView(View):
     def get(self, request, slug):
-        product = get_object_or_404(Product, slug=slug)
-        if product:
+        product = Product.objects.filter(slug=slug)
+        if product.exists():
             product.delete()
             messages.warning(request, "Product has been deleted!")
             return redirect("seller_products_page")
@@ -329,7 +329,7 @@ class AddingProductToWishListView(LoginRequiredMixin, View):
             product = get_object_or_404(Product, slug=slug)
             WishList.objects.create(owner=request.user, product=product)
             messages.success(request, "Product has been added to WishList!")
-            return redirect("displaying_wishlist_page")
+            return redirect("products_page")
 
 
 class DeletingProductWishListView(View):
