@@ -114,19 +114,25 @@ class CreateProductSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         try:
-            images = validated_data.pop('images')
-            print("----Images-----\t", images)
             request = self.context.get('request')
-            validated_data['slug'] = slugify(validated_data.get('name'))
+            if request.user.seller_or_customer != 'seller':
+                raise ValidationError('you are not a seller!')
             validated_data['created_by'] = request.user
+            images = validated_data.pop('images')
+            validated_data['slug'] = slugify(validated_data.get('name'))
             pr = Product.objects.create(**validated_data)
             ProductImageSerializer().create({"image": images, "product": pr})
             return pr
         except IntegrityError as e:
-            raise IntegrityError({"error": "Some error occurred!"})
-
+            raise IntegrityError({"error": "IntegrityError occurred!"})
         except DataError as e:
             raise DataError({"error": "DataError occurred!"})
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['success'] = True
+        data['message'] = 'Successfully created!'
+        return data
 
 
 class WishListSerializer(serializers.ModelSerializer):

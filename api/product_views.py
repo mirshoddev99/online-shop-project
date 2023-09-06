@@ -88,7 +88,7 @@ class SellerProductListAPIView(ListAPIView):
             q = Q(created_by__pk=user.pk) & Q(in_active=True)
             return super().get_queryset().filter(q)
         except Http404:
-            raise ValidationError("You are not seller!")
+            raise ValidationError("You are not a seller!")
 
 
 # WishList
