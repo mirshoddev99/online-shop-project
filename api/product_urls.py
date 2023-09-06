@@ -3,15 +3,16 @@ from api.product_views import ProductListAPIView, CategoryProductListAPIView, \
     SubCategoryProductListAPIView, DetailProductAPIView, WishListAPIView, CreatingWishListProductAPIView, \
     DeletingWishListProductAPIView, ProductCartListAPIView, DeleteCartProductQuantityAPIViw, DeletingCartProductView, \
     ClearProductCartAPIView, AddingCartProductView, ClearWishListAPIView, ProductCommentAPIView, \
-    SellerProductListAPIView, CreateProductAPIView
+    SellerProductListAPIView, CreateProductAPIView, SearchProductAPIView
 
 urlpatterns = [
     path('product-list/', ProductListAPIView.as_view()),
+    path('search-product-list/', SearchProductAPIView.as_view()),
     path('seller-products-list/', SellerProductListAPIView.as_view()),
     path('create-product/', CreateProductAPIView.as_view()),
     path('category-product-list/<int:category_id>/', CategoryProductListAPIView.as_view()),
     path('subcategory-product-list/<int:category_id>/<int:sub_category_id>/', SubCategoryProductListAPIView.as_view()),
-    path('product-detail/<int:id>/', DetailProductAPIView.as_view(), name='product_detail'),
+    path('crud-product/<int:id>/', DetailProductAPIView.as_view(), name='product_detail'),
     path('product-comments/<int:product_id>/', ProductCommentAPIView.as_view()),
 
     path('wishlist-products/', WishListAPIView.as_view()),

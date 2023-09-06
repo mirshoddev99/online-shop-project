@@ -9,15 +9,9 @@ from users.models import CustomUser
 
 
 class UserSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField(method_name='get_full_name')
-
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'full_name', 'seller_or_customer']
-
-    @staticmethod
-    def get_full_name(obj):
-        return obj.full_name
+        fields = ['id', 'username']
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -32,32 +26,9 @@ class SubCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name']
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    created_by = UserSerializer(read_only=True)
-    category = CategorySerializer(read_only=True)
-    sub_category = SubCategorySerializer(read_only=True)
-    url = serializers.SerializerMethodField(read_only=True, method_name="get_url")
-
+class ReducedProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'url', 'name',
-                  'price',
-                  'size',
-                  'quantity',
-                  'in_active',
-                  'slug',
-                  'category',
-                  'sub_category',
-                  'created_by',
-                  'created_at']
-
-    def get_url(self, obj):
-        request = self.context.get('request')
-        return reverse("product_detail", kwargs={"id": obj.pk}, request=request)
-
-
-class ReducedProductSerializer(ProductSerializer):
-    class Meta(ProductSerializer.Meta):
         fields = ['id', 'name', 'price']
 
 
@@ -133,6 +104,42 @@ class CreateProductSerializer(serializers.Serializer):
         data['success'] = True
         data['message'] = 'Successfully created!'
         return data
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    created_by = UserSerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
+    sub_category = SubCategorySerializer(read_only=True)
+    url = serializers.SerializerMethodField(read_only=True, method_name="get_url")
+    name = serializers.CharField()
+    price = serializers.DecimalField(max_digits=7, decimal_places=2)
+    size = serializers.CharField(write_only=True, required=False)
+    quantity = serializers.IntegerField(write_only=True, required=True)
+
+    class Meta:
+        model = Product
+        fields = ['id', 'url', 'name',
+                  'price',
+                  'size',
+                  'quantity',
+                  'in_active',
+                  'category',
+                  'sub_category',
+                  'created_by',
+                  'created_at']
+
+    def get_url(self, obj):
+        request = self.context.get('request')
+        return reverse("product_detail", kwargs={"id": obj.pk}, request=request)
+
+    # def update(self, instance, validated_data):
+    #     instance.slug = validated_data(slugify(validated_data['name']), instance.slug)
+    #     instance.name = validated_data('name', instance.name)
+    #     instance.price = validated_data('price', instance.price)
+    #     instance.size = validated_data('size', instance.size)
+    #     instance.quantity = validated_data('quantity', instance.quantity)
+    #     instance.save()
+    #     return instance
 
 
 class WishListSerializer(serializers.ModelSerializer):

@@ -26,6 +26,80 @@ class CreateProductAPIView(CreateAPIView):
     queryset = Product.objects.all()
 
 
+class DetailProductAPIView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_url_kwarg = 'id'
+
+    def put(self, request, *args, **kwargs):
+        try:
+            q = Q(created_by__id=request.user.pk) & Q(id=kwargs.get('id'))
+            obj = Product.objects.get(q)
+            serializer = self.serializer_class(instance=obj, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            data = {"success": True, "message": "Product successfully updated", }
+            return Response(data)
+        except ObjectDoesNotExist:
+            data = {"success": False, "error": "Product not found or You are not a creator of this product!"}
+            return Response(data)
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            q = Q(created_by__id=request.user.pk) & Q(id=kwargs.get('id'))
+            obj = Product.objects.get(q)
+            print("--------User---------\t", request.user)
+            obj.delete()
+            data = {"success": True, "message": "Product has been removed!"}
+            return Response(data)
+        except ObjectDoesNotExist:
+            data = {"success": False, "error": "Product not found or You are not a creator of this product!"}
+            return Response(data)
+
+
+class ProductCommentAPIView(ListCreateAPIView):
+    queryset = ProductComment.objects.all()
+    serializer_class = ProductCommentSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        query = Q(author__id=self.request.user.pk) & Q(product__id=self.kwargs['product_id'])
+        return super().get_queryset().filter(query)
+
+    def perform_create(self, serializer):
+        product = Product.objects.get(id=self.kwargs["product_id"])
+        serializer.is_valid(raise_exception=True)
+        serializer.save(author=self.request.user, product=product)
+
+
+class SearchProductAPIView(ListAPIView):
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        q = self.request.GET.get("search_product")
+        query = Q(name__icontains=q) | Q(description__icontains=q) | Q(name__iexact=q)
+        return qs.filter(query)[:10]
+
+
+class SellerProductListAPIView(ListAPIView):
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        try:
+            user = get_object_or_404(CustomUser, id=self.request.user.pk, seller_or_customer='seller')
+            q = Q(created_by__pk=user.pk) & Q(in_active=True)
+            return super().get_queryset().filter(q)
+        except Http404:
+            raise ValidationError("You are not a seller!")
+
+
+# Category
 class CategoryProductListAPIView(ListAPIView):
     serializer_class = ProductSerializer
     pagination_class = CustomPagination
@@ -47,48 +121,6 @@ class SubCategoryProductListAPIView(ListAPIView):
         q = super().get_queryset().filter(category__id=self.kwargs["category_id"],
                                           sub_category__id=self.kwargs["sub_category_id"])
         return q
-
-
-class DetailProductAPIView(APIView):
-    permission_classes = [permissions.AllowAny, ]
-
-    def get(self, request, *args, **kwargs):
-        try:
-            obj = Product.objects.get(id=kwargs["id"])
-            serializer = ProductSerializer(obj)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ObjectDoesNotExist as e:
-            data = {"success": False, "error": f"{e}"}
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ProductCommentAPIView(ListCreateAPIView):
-    queryset = ProductComment.objects.all()
-    serializer_class = ProductCommentSerializer
-    pagination_class = CustomPagination
-
-    def get_queryset(self):
-        query = Q(author__id=self.request.user.pk) & Q(product__id=self.kwargs['product_id'])
-        return super().get_queryset().filter(query)
-
-    def perform_create(self, serializer):
-        product = Product.objects.get(id=self.kwargs["product_id"])
-        serializer.is_valid(raise_exception=True)
-        serializer.save(author=self.request.user, product=product)
-
-
-class SellerProductListAPIView(ListAPIView):
-    serializer_class = ProductSerializer
-    queryset = Product.objects.all()
-    pagination_class = CustomPagination
-
-    def get_queryset(self):
-        try:
-            user = get_object_or_404(CustomUser, id=self.request.user.pk, seller_or_customer='seller')
-            q = Q(created_by__pk=user.pk) & Q(in_active=True)
-            return super().get_queryset().filter(q)
-        except Http404:
-            raise ValidationError("You are not a seller!")
 
 
 # WishList
