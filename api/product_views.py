@@ -35,7 +35,7 @@ class DetailProductAPIView(generics.RetrieveUpdateDestroyAPIView):
     def put(self, request, *args, **kwargs):
         try:
             q = Q(created_by__id=request.user.pk) & Q(id=kwargs.get('id'))
-            obj = Product.objects.get(q)
+            obj = Product.objects.filter(q).first()
             images_data = request.data.pop('images')
             print("-------Images----------\t", images_data)
             serializer = self.serializer_class(instance=obj, data=request.data, partial=True)
@@ -51,7 +51,7 @@ class DetailProductAPIView(generics.RetrieveUpdateDestroyAPIView):
 
             data = {"success": True, "message": "Product successfully updated"}
             return Response(data)
-        except ObjectDoesNotExist:
+        except Http404:
             data = {"success": False, "error": "Product not found or You are not a creator of this product!"}
             return Response(data)
 

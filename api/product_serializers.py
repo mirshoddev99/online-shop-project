@@ -116,7 +116,7 @@ class ProductSerializer(serializers.ModelSerializer):
     size = serializers.CharField(write_only=True, required=False)
     quantity = serializers.IntegerField(write_only=True, required=True)
     in_active = serializers.BooleanField(required=False, read_only=True)
-    images = serializers.ListField(child=serializers.ImageField())
+    images = serializers.ListSerializer(child=serializers.ImageField(required=False), required=False)
 
     class Meta:
         model = Product
