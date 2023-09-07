@@ -2,7 +2,7 @@
 ### Welcome to the Fantastic E-Commerce Project README! This comprehensive E-Commerce solution is built using Django and Django Rest Framework, offering a wide range of features for your online store. Let's dive into the exciting world of this project!
 
 ** Server-Side Project 🛠️
-The server-side project is the heart of our E-Commerce system. It handles the backend logic, database management, and serves as the foundation for our API.
+The server-side project is the heart of our E-Commerce system. It handles the backend logic, database management, and serves as the foundation for our API.**
 
 Features ✨
 Authentication and Authorization 🔐
