@@ -25,15 +25,19 @@ API Documentation 📖
 
 ### Features ✨
  User Authentication 🔑
- -- *User login, logout, change password, and reset password functionalities.*
+-- *User login, logout, change password, and reset password functionalities.*
+
  User Types 🧑🛒
-   -- *Users can register as either sellers or customers, offering a tailored experience.*
+ -- *Users can register as either sellers or customers, offering a tailored experience.*
+ 
   Shopping Cart 🛒
   -- *Robust shopping cart functionality for customers to easily add and manage items.*
+  
  WishList ❤️
-   -- *Wishlist feature for users to save items they plan to purchase later.*
+ -- *Wishlist feature for users to save items they plan to purchase later.*
+ 
   Payment via PayPal 💳
-    -- *Integrated PayPal payment gateway for secure and convenient transactions.*
+  -- *Integrated PayPal payment gateway for secure and convenient transactions.*
 
 API Documentation with Swagger 📖
  -- *Detailed API documentation powered by Swagger for developers to explore and utilize the API.*
