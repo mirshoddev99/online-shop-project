@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from api.custom_methods import CustomPagination
 from api.product_serializers import ProductSerializer, WishListSerializer, ProductCartSerializer, \
     ProductCommentSerializer, CreateProductSerializer
-from product_app.models import Product, WishList, ProductCart, ProductComment
+from product_app.models import Product, WishList, ProductCart, ProductComment, ProductImage
 from users.models import CustomUser
 
 
@@ -36,10 +36,20 @@ class DetailProductAPIView(generics.RetrieveUpdateDestroyAPIView):
         try:
             q = Q(created_by__id=request.user.pk) & Q(id=kwargs.get('id'))
             obj = Product.objects.get(q)
+            images_data = request.data.pop('images')
+            print("-------Images----------\t", images_data)
             serializer = self.serializer_class(instance=obj, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
-            serializer.save()
-            data = {"success": True, "message": "Product successfully updated", }
+            product = serializer.save()
+            if images_data:
+                for img in product.images.all():
+                    if img.image not in images_data:
+                        img.delete()
+                for img in images_data:
+                    dc = {"image": img, "product": product}
+                    ProductImage.objects.create(**dc)
+
+            data = {"success": True, "message": "Product successfully updated"}
             return Response(data)
         except ObjectDoesNotExist:
             data = {"success": False, "error": "Product not found or You are not a creator of this product!"}

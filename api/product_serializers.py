@@ -108,13 +108,15 @@ class CreateProductSerializer(serializers.Serializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     created_by = UserSerializer(read_only=True)
-    category = CategorySerializer(read_only=True)
-    sub_category = SubCategorySerializer(read_only=True)
+    category = CategorySerializer()
+    sub_category = SubCategorySerializer()
     url = serializers.SerializerMethodField(read_only=True, method_name="get_url")
     name = serializers.CharField()
     price = serializers.DecimalField(max_digits=7, decimal_places=2)
     size = serializers.CharField(write_only=True, required=False)
     quantity = serializers.IntegerField(write_only=True, required=True)
+    in_active = serializers.BooleanField(required=False, read_only=True)
+    images = serializers.ListField(child=serializers.ImageField())
 
     class Meta:
         model = Product
@@ -126,20 +128,11 @@ class ProductSerializer(serializers.ModelSerializer):
                   'category',
                   'sub_category',
                   'created_by',
-                  'created_at']
+                  'created_at', 'images']
 
     def get_url(self, obj):
         request = self.context.get('request')
         return reverse("product_detail", kwargs={"id": obj.pk}, request=request)
-
-    # def update(self, instance, validated_data):
-    #     instance.slug = validated_data(slugify(validated_data['name']), instance.slug)
-    #     instance.name = validated_data('name', instance.name)
-    #     instance.price = validated_data('price', instance.price)
-    #     instance.size = validated_data('size', instance.size)
-    #     instance.quantity = validated_data('quantity', instance.quantity)
-    #     instance.save()
-    #     return instance
 
 
 class WishListSerializer(serializers.ModelSerializer):

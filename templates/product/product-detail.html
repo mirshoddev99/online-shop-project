@@ -32,7 +32,7 @@
 							<div class="wrap-slick3-arrows flex-sb-m flex-w"></div>
 
 							<div class="slick3 gallery-lb">
-						{% for image in product.images.all %}
+						{% for image in images %}
 						{% with available_image=product.images.all|first_available_image %}
 						{% if available_image %}
 								<div class="item-slick3" data-thumb="{{ image.image.url }}">

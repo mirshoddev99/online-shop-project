@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.defaultfilters import slugify
 from django.urls import reverse
@@ -61,17 +61,21 @@ class ProductListView(View):
 
 class ProductDetailView(View):
     def get(self, request, slug):
-        product = Product.objects.get(slug=slug)
-        ctg_name = product.category.name
-        sub_ctg_name = product.sub_category.name
-        q = Q(category__name=ctg_name) & Q(sub_category__name=sub_ctg_name)
-        related_products = Product.objects.all().filter(q).exclude(slug=slug)[:8]
-        for img in product.images.all():
-            if not img.image:
-                img.delete()
-        contex = {"product": product, "related_products": related_products, "ctg_name": ctg_name,
-                  "sub_ctg_name": sub_ctg_name}
-        return render(request, "product/product-detail.html", contex)
+        try:
+            product = Product.objects.get(slug=slug)
+            ctg_name = product.category.name
+            sub_ctg_name = product.sub_category.name
+            q = Q(category__name=ctg_name) & Q(sub_category__name=sub_ctg_name)
+            related_products = Product.objects.all().filter(q).exclude(slug=slug)[:8]
+            for img in product.images.all():
+                if not img.image:
+                    img.delete()
+            images = product.images.all().order_by('-id')
+            contex = {"product": product, "related_products": related_products, "ctg_name": ctg_name,
+                      "sub_ctg_name": sub_ctg_name, 'images': images}
+            return render(request, "product/product-detail.html", contex)
+        except ObjectDoesNotExist:
+            return HttpResponse(content={"success": False, "message": "Product not found!"})
 
 
 # Creating Product Logic
