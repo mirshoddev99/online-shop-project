@@ -25,9 +25,9 @@ API Documentation 📖
 
 ### Features ✨
  User Authentication 🔑
- -- *User login, logout, change password, and reset password functionalities.
- User Types 🧑🛒*
-   -- *Users can register as either sellers or customers, offering a tailored experience.
+ -- *User login, logout, change password, and reset password functionalities.*
+ User Types 🧑🛒
+   -- *Users can register as either sellers or customers, offering a tailored experience.*
   Shopping Cart 🛒
   -- *Robust shopping cart functionality for customers to easily add and manage items.*
  WishList ❤️
