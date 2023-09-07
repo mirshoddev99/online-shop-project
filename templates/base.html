@@ -60,28 +60,28 @@
 					</div>
 
 					<div class="right-top-bar flex-w h-full">
-						<a href="#" class="flex-c-m trans-04 p-lr-25">
-							{% if request.user.is_authenticated %}
-								<a href="{% url 'logout_page' %}">logout</a>
-							{% else %}
-								<a href="{% url 'test_register_page' %}">register</a>
-							{% endif %}
+						{% if request.user.is_authenticated %}
+						<a href="{% url 'logout_page' %}" class="flex-c-m trans-04 p-lr-25">
+								logout
 						</a>
-
-						<a href="#" class="flex-c-m trans-04 p-lr-25">
-							{% if not request.user.is_authenticated %}
-								<a href="{% url 'login_page' %}">login</a>
-							{% else %}
-								<a href="{% url 'profile_page' request.user.username %}">{{ request.user.username }}</a>
-							{% endif %}
+						{% else %}
+						<a href="{% url 'test_register_page' %}" class="flex-c-m trans-04 p-lr-25">
+								register
 						</a>
+						{% endif %}
 
-						<a href="#" class="flex-c-m trans-04 p-lr-25">
-							EN
+						{% if not request.user.is_authenticated %}
+						<a href="{% url 'login_page' %}" class="flex-c-m trans-04 p-lr-25">
+								login
 						</a>
+						{% else %}
+						<a href="{% url 'profile_page' request.user.username %}" class="flex-c-m trans-04 p-lr-25">
+								{{ request.user.username }}
+						</a>
+						{% endif %}
 
-						<a href="#" class="flex-c-m trans-04 p-lr-25">
-							USD
+						<a href="{% url 'api' %}" class="flex-c-m trans-04 p-lr-25">
+							API
 						</a>
 					</div>
 				</div>
