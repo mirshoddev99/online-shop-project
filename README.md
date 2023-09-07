@@ -1,4 +1,4 @@
-#### Fantastic E-Commerce Project 🌟
+### Fantastic E-Commerce Project 🌟
 ### Welcome to the Fantastic E-Commerce Project README! This comprehensive E-Commerce solution is built using Django and Django Rest Framework, offering a wide range of features for your online store. Let's dive into the exciting world of this project!
 
 ## Server-Side Project 🛠️
