@@ -62,7 +62,7 @@
 									<a href="{% url 'products_page' %}" style="color: inherit">Continue shopping</a>
 								</div>
 							</div>
-							{% if cart_products.first.get_count_of_products %}
+							{% if cart_products.first.get_total_products %}
 							<div class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">
 								<a href="{% url 'clearing_products_page' %}" style="color: inherit">Clear cart</a>
 							</div>

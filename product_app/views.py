@@ -161,9 +161,13 @@ class SellerProductsListView(View):
     def get(self, request):
         query = Q(created_by__pk=request.user.pk) & Q(in_active=True)
         all_products = Product.objects.all().filter(query)
-        categories = set([ctg for ctg in all_products])
-        contex = {"all_products": all_products, "categories": categories}
-        return render(request, "product/seller_products_list.html", contex)
+        if all_products.exists():
+            categories = set([product.category for product in all_products])
+            contex = {"all_products": all_products, "categories": categories}
+            return render(request, "product/seller_products_list.html", contex)
+        else:
+            messages.warning(request, "You haven't created product yet!")
+            return redirect("home_page")
 
 
 class ProductCommentView(LoginRequiredMixin, View):
