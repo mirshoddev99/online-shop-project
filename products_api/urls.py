@@ -1,5 +1,5 @@
 from django.urls import path
-from api.product_views import ProductListAPIView, CategoryProductListAPIView, \
+from products_api.views import ProductListAPIView, CategoryProductListAPIView, \
     SubCategoryProductListAPIView, DetailProductAPIView, WishListAPIView, CreatingWishListProductAPIView, \
     DeletingWishListProductAPIView, ProductCartListAPIView, DeleteCartProductQuantityAPIViw, DeletingCartProductView, \
     ClearProductCartAPIView, AddingCartProductView, ClearWishListAPIView, ProductCommentAPIView, \

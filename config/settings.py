@@ -24,7 +24,8 @@ INSTALLED_APPS = [
 
     'product_app',
     'users',
-    'api',
+    'users_api',
+    'products_api',
 
     # external apps
     'paypal.standard.ipn',

@@ -1,15 +1,11 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.generics import get_object_or_404
-from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import AccessToken
 
-from api.custom_methods import get_user
 from users.email import sending_code
 from users.models import CustomUser, CODE_VERIFIED
 
@@ -44,8 +40,6 @@ class SignUpSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password')
         validated_data.pop('confirm_password')
-        # if validated_data.get('full_name', None) is None:
-        #     validated_data.pop('full_name')
         user = super().create(validated_data)
         user.set_password(password)
         code = user.create_verify_code()
