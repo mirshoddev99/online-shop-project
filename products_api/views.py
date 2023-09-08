@@ -6,8 +6,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, ListCreateAPIView, CreateAPIView, DestroyAPIView, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from api.custom_methods import CustomPagination
-from api.product_serializers import ProductSerializer, WishListSerializer, ProductCartSerializer, \
+from products_api.custom_methods import CustomPagination
+from products_api.serializers import ProductSerializer, WishListSerializer, ProductCartSerializer, \
     ProductCommentSerializer, CreateProductSerializer
 from product_app.models import Product, WishList, ProductCart, ProductComment, ProductImage
 from users.models import CustomUser
@@ -87,6 +87,7 @@ class SearchProductAPIView(ListAPIView):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
     pagination_class = CustomPagination
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
 
     def get_queryset(self):
         qs = super().get_queryset()

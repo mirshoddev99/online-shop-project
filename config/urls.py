@@ -10,8 +10,8 @@ urlpatterns = [
     path('', include('product_app.urls')),
     path('users/', include('users.urls')),
     path('api-docs/', docs_view, name='api'),
-    path('api/', include('api.user_urls')),
-    path('api/', include('api.product_urls')),
+    path('users_api/', include('users_api.urls')),
+    path('products_api/', include('products_api.urls')),
     path('paypal/', include("paypal.standard.ipn.urls")),
 ]
 

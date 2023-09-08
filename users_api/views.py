@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from api.serializers import CustomUserSerializer, SignUpSerializer, ChangeUserInfoSerializer, UserLoginSerializer, \
+from users_api.serializers import CustomUserSerializer, SignUpSerializer, ChangeUserInfoSerializer, UserLoginSerializer, \
     UserLoginRefreshSerializeR, UserLogoutSerializer
 from users.email import sending_code
 from users.models import CustomUser, NEW, CODE_VERIFIED
