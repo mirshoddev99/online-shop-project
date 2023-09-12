@@ -16,7 +16,7 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(CustomerAddress)
 class CustomerAddressAdmin(admin.ModelAdmin):
-    list_display = ['id', 'customer', 'country', 'street', 'city']
+    list_display = ['id', 'customer', 'country', 'street', 'city', 'zipcode']
 
 
 @admin.register(UserConfirmation)

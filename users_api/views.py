@@ -1,16 +1,18 @@
-
+from django.http import Http404
 from django.utils.datetime_safe import datetime
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import ValidationError
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from users_api.serializers import CustomUserSerializer, SignUpSerializer, ChangeUserInfoSerializer, UserLoginSerializer, \
-    UserLoginRefreshSerializeR, UserLogoutSerializer
+    UserLoginRefreshSerializeR, UserLogoutSerializer, CustomerAddressSerializer
 from users.email import sending_code
-from users.models import CustomUser, NEW, CODE_VERIFIED
+from users.models import CustomUser, NEW, CODE_VERIFIED, CustomerAddress
+from rest_framework import generics
 
 
 class SignUpAPIView(generics.CreateAPIView):
@@ -99,3 +101,45 @@ class UserLogoutAPIView(APIView):
 
         except TokenError as e:
             raise TokenError(e)
+
+
+# User Address
+class UserAddressAPIView(generics.CreateAPIView):
+    serializer_class = CustomerAddressSerializer
+    queryset = CustomerAddress.objects.all()
+    permission_classes = [permissions.IsAuthenticated, ]
+
+    def perform_create(self, serializer):
+        # get requested user
+        user = self.request.user
+        if CustomerAddress.objects.filter(customer__id=user.id).exists():
+            raise ValidationError("You have already your address!")
+        else:
+            serializer.is_valid(raise_exception=True)
+            serializer.save(customer=user)
+
+
+class UserAddressRetrieveDestroyUpdateAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CustomerAddressSerializer
+    queryset = CustomerAddress.objects.all()
+    lookup_url_kwarg = 'id'
+
+    def put(self, request, *args, **kwargs):
+        try:
+            obj = get_object_or_404(CustomerAddress, customer__id=kwargs['id'])
+            serializer = self.serializer_class(instance=obj, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            data = {'success': True, 'message': "Your Address updated successfully!", 'data': serializer.data}
+            return Response(data)
+        except Http404:
+            return Response("You have no address so you need to create your address!")
+
+    def delete(self, request, * args, ** kwargs):
+        try:
+            obj = get_object_or_404(CustomerAddress, customer__id=kwargs['id'])
+            obj.delete()
+            data = {'success': True, 'message': "Your Address deleted successfully!"}
+            return Response(data)
+        except Http404:
+            return Response("You have no address so you need to create your address!")

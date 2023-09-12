@@ -1,6 +1,7 @@
 from django.urls import path
-from users_api.views import SignUpAPIView, VerifyUserAPIView, GetNewVerification, UpdateUserInfoAPIView, UserLoginAPIView, \
-    UserLoginRefreshAPIView, UserLogoutAPIView
+from users_api.views import SignUpAPIView, VerifyUserAPIView, GetNewVerification, UpdateUserInfoAPIView, \
+    UserLoginAPIView, \
+    UserLoginRefreshAPIView, UserLogoutAPIView, UserAddressAPIView, UserAddressRetrieveDestroyUpdateAPIView
 
 urlpatterns = [
     path('register/', SignUpAPIView.as_view()),
@@ -10,5 +11,7 @@ urlpatterns = [
     path('user-login/', UserLoginAPIView.as_view()),
     path('user-login-refresh/', UserLoginRefreshAPIView.as_view()),
     path('user-logout/', UserLogoutAPIView.as_view()),
+    path('user-address/', UserAddressAPIView.as_view()),
+    path('user-address-crud/<int:id>/', UserAddressRetrieveDestroyUpdateAPIView.as_view()),
 
 ]

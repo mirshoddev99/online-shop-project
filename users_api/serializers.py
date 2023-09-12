@@ -7,7 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, Toke
 from rest_framework_simplejwt.tokens import AccessToken
 
 from users.email import sending_code
-from users.models import CustomUser, CODE_VERIFIED
+from users.models import CustomUser, CODE_VERIFIED, CustomerAddress
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -15,7 +15,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'full_name', 'email', 'phone', 'seller_or_customer', 'birth_date', 'avatar']
+        fields = ['id', 'username', 'full_name', 'email', 'phone', 'seller_or_customer']
 
     @staticmethod
     def get_full_name(obj):
@@ -163,3 +163,21 @@ class UserLoginRefreshSerializeR(TokenRefreshSerializer):
 
 class UserLogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
+
+
+class CustomerAddressSerializer(serializers.ModelSerializer):
+    customer = CustomUserSerializer(required=False)
+    street = serializers.CharField(required=True)
+    city = serializers.CharField(required=True)
+    country = serializers.CharField(required=True)
+    zipcode = serializers.CharField(max_length=5)
+
+    class Meta:
+        model = CustomerAddress
+        fields = ["customer", 'street', 'city', 'country', 'zipcode']
+
+    @staticmethod
+    def validate_zipcode(zipcode):
+        if not zipcode.isdigit():
+            raise ValidationError("You must enter only digits!")
+        return zipcode
