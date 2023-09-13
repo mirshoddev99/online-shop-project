@@ -79,7 +79,7 @@ class ProductDetailView(View):
 
 
 # Creating Product Logic
-class CreateProductView(View):
+class CreateProductView(LoginRequiredMixin, View):
     def get(self, request):
         product_form = CreateProductForm()
         image_form_set = inlineformset_factory(Product, ProductImage, form=ImageForm, extra=3)
@@ -114,7 +114,7 @@ class CreateProductView(View):
             return render(request, "product/new_product.html", contex)
 
 
-class UpdateProductView(View):
+class UpdateProductView(LoginRequiredMixin, View):
     def get(self, request, slug):
         product = get_object_or_404(Product, slug=slug)
         update_product_form = UpdateProductForm(instance=product)
@@ -145,7 +145,7 @@ class UpdateProductView(View):
             return render(request, "product/update_product.html", contex)
 
 
-class DeleteProductView(View):
+class DeleteProductView(LoginRequiredMixin, View):
     def get(self, request, slug):
         product = Product.objects.filter(slug=slug)
         if product.exists():
@@ -271,39 +271,46 @@ class AddingCartProductView(LoginRequiredMixin, View):
 
 
 # This View is used for deleting one product from the cart when the decrement button is clicked on
-class DeletingCartProductView(View):
+class DeletingCartProductView(LoginRequiredMixin, View):
     def get(self, request, slug):
-        cart_query = Q(owner__pk=request.user.pk) & Q(product__slug=slug)
-        cart_product = get_object_or_404(ProductCart, cart_query)
-        if cart_product.get_quantity() >= 1:
-            cart_product.product.quantity += 1
-            cart_product.quantity -= 1
-            if not cart_product.product.in_active:
-                cart_product.product.in_active = True
-            cart_product.product.save()
-            cart_product.save()
-            if cart_product.quantity == 0:
-                cart_product.delete()
-                messages.success(request, "Product has been removed from your cart!")
-            return redirect("shopping_cart_page") if ProductCart.get_total_products() else redirect("products_page")
+        try:
+            cart_query = Q(owner__pk=request.user.pk) & Q(product__slug=slug)
+            cart_product = get_object_or_404(ProductCart, cart_query)
+            if cart_product.get_quantity() >= 1:
+                cart_product.product.quantity += 1
+                cart_product.quantity -= 1
+                if not cart_product.product.in_active:
+                    cart_product.product.in_active = True
+                cart_product.product.save()
+                cart_product.save()
+                if cart_product.quantity == 0:
+                    cart_product.delete()
+                    messages.success(request, "Product has been removed from your cart!")
+                return redirect("shopping_cart_page") if ProductCart.get_total_products() else redirect("products_page")
+
+        except Http404:
+            return HttpResponse("Nothing found!")
 
 
 # This View is used for deleting product with total quantity from the cart when the delete button is clicked on
 class DeleteProductFromCartViw(View):
     def get(self, request, slug):
-        cart_query = Q(owner__pk=request.user.pk) & Q(product__slug=slug)
-        cart_product = get_object_or_404(ProductCart, cart_query)
-        cart_product.product.quantity += cart_product.get_quantity()
-        if not cart_product.product.in_active:
-            cart_product.product.in_active = True
-        cart_product.product.save()
-        cart_product.delete()
-        messages.success(request, "Product has been removed from your cart!")
-        print("Cart products", ProductCart.get_total_products())
-        return redirect("shopping_cart_page") if ProductCart.get_total_products() else redirect("products_page")
+        try:
+            cart_query = Q(owner__pk=request.user.pk) & Q(product__slug=slug)
+            cart_product = get_object_or_404(ProductCart, cart_query)
+            cart_product.product.quantity += cart_product.get_quantity()
+            if not cart_product.product.in_active:
+                cart_product.product.in_active = True
+            cart_product.product.save()
+            cart_product.delete()
+            messages.success(request, "Product has been removed from your cart!")
+            print("Cart products", ProductCart.get_total_products())
+            return redirect("shopping_cart_page") if ProductCart.get_total_products() else redirect("products_page")
+        except Http404:
+            return HttpResponse("Nothing found!")
 
 
-class ClearingCartView(View):
+class ClearingCartView(LoginRequiredMixin, View):
     def get(self, request):
         cart_products = ProductCart.objects.all().filter(owner__pk=request.user.pk)
         for p in cart_products:
@@ -342,23 +349,27 @@ class AddingProductToWishListView(LoginRequiredMixin, View):
 
 class DeletingProductWishListView(View):
     def get(self, request, slug):
-        wishlist_query = Q(owner__pk=request.user.pk) & Q(product__slug=slug)
-        product = get_object_or_404(WishList, wishlist_query)
-        product.delete()
-        messages.success(request, "Product has been removed from your WishList!")
-
-        if WishList.get_total_products() >= 1:
-            return redirect("displaying_wishlist_page")
-        return redirect("products_page")
+        try:
+            wishlist_query = Q(owner__pk=request.user.pk) & Q(product__slug=slug)
+            product = get_object_or_404(WishList, wishlist_query)
+            product.delete()
+            messages.success(request, "Product has been removed from your WishList!")
+            if WishList.get_total_products() >= 1:
+                return redirect("displaying_wishlist_page")
+            return redirect("products_page")
+        except Http404:
+            return HttpResponse("Nothing found!")
 
 
 # Search and Filter logic
 class SearchProduct(View):
     def get(self, request):
         q = request.GET.get("search_product")
-        query = Q(name__icontains=q) | Q(description__icontains=q)
-        products = Product.objects.all().filter(query)[:10]
-        return render(request, "product/searched_products.html", {"products": products})
+        if q != "":
+            query = Q(name__icontains=q) | Q(description__icontains=q)
+            products = Product.objects.all().filter(query)[:10]
+            return render(request, "product/searched_products.html", {"products": products})
+        return HttpResponse("Nothing entered!")
 
 
 # Billing and Payment Logic

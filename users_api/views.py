@@ -8,8 +8,10 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+from product_app.models import PaymentCard
 from users_api.serializers import CustomUserSerializer, SignUpSerializer, ChangeUserInfoSerializer, UserLoginSerializer, \
-    UserLoginRefreshSerializeR, UserLogoutSerializer, CustomerAddressSerializer
+    UserLoginRefreshSerializeR, UserLogoutSerializer, CustomerAddressSerializer, PaymentCardSerializer
 from users.email import sending_code
 from users.models import CustomUser, NEW, CODE_VERIFIED, CustomerAddress
 from rest_framework import generics
@@ -104,16 +106,15 @@ class UserLogoutAPIView(APIView):
 
 
 # User Address
-class UserAddressAPIView(generics.CreateAPIView):
+class CreateUserAddressAPIView(generics.CreateAPIView):
     serializer_class = CustomerAddressSerializer
     queryset = CustomerAddress.objects.all()
-    permission_classes = [permissions.IsAuthenticated, ]
 
     def perform_create(self, serializer):
         # get requested user
         user = self.request.user
         if CustomerAddress.objects.filter(customer__id=user.id).exists():
-            raise ValidationError("You have already your address!")
+            raise ValidationError("You have already shipping address!")
         else:
             serializer.is_valid(raise_exception=True)
             serializer.save(customer=user)
@@ -123,6 +124,14 @@ class UserAddressRetrieveDestroyUpdateAPIView(generics.RetrieveUpdateDestroyAPIV
     serializer_class = CustomerAddressSerializer
     queryset = CustomerAddress.objects.all()
     lookup_url_kwarg = 'id'
+
+    def get(self, request, *args, **kwargs):
+        try:
+            obj = get_object_or_404(CustomerAddress, customer__id=kwargs['id'])
+            serializer = self.serializer_class(obj)
+            return Response(serializer.data)
+        except Http404:
+            return Response("You have no address so you need to create your address!")
 
     def put(self, request, *args, **kwargs):
         try:
@@ -135,7 +144,7 @@ class UserAddressRetrieveDestroyUpdateAPIView(generics.RetrieveUpdateDestroyAPIV
         except Http404:
             return Response("You have no address so you need to create your address!")
 
-    def delete(self, request, * args, ** kwargs):
+    def delete(self, request, *args, **kwargs):
         try:
             obj = get_object_or_404(CustomerAddress, customer__id=kwargs['id'])
             obj.delete()
@@ -143,3 +152,54 @@ class UserAddressRetrieveDestroyUpdateAPIView(generics.RetrieveUpdateDestroyAPIV
             return Response(data)
         except Http404:
             return Response("You have no address so you need to create your address!")
+
+
+# Payment card
+class CreatePaymentCardAPIView(generics.CreateAPIView):
+    serializer_class = PaymentCardSerializer
+    queryset = PaymentCard.objects.all()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if not PaymentCard.objects.filter(owner__id=user.pk).exists():
+            if CustomerAddress.objects.filter(customer__id=user.id).exists():
+                serializer.is_valid(raise_exception=True)
+                serializer.save(owner=user)
+            else:
+                raise ValidationError("You must add shipping address first before creating a payment card!")
+        else:
+            raise ValidationError("You have already payment card!")
+
+
+class CRUDPaymentCardAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PaymentCardSerializer
+    queryset = PaymentCard.objects.all()
+    lookup_url_kwarg = 'id'
+
+    def get(self, request, *args, **kwargs):
+        try:
+            obj = get_object_or_404(PaymentCard, owner__id=kwargs['id'])
+            serializer = self.serializer_class(obj)
+            return Response(serializer.data)
+        except Http404:
+            return Response(self.serializer_class.errors)
+
+    def put(self, request, *args, **kwargs):
+        try:
+            obj = get_object_or_404(PaymentCard, owner__id=kwargs['id'])
+            serializer = self.serializer_class(instance=obj, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            data = {'success': True, 'message': "Your Payment Card credentials updated successfully!", 'data': serializer.data}
+            return Response(data)
+        except Http404:
+            return Response(self.serializer_class.errors)
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            obj = get_object_or_404(PaymentCard, owner__id=kwargs['id'])
+            obj.delete()
+            data = {'success': True, 'message': "Your Payment Card deleted successfully!"}
+            return Response(data)
+        except Http404:
+            return Response(self.serializer_class.errors)

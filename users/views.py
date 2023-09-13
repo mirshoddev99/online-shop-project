@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordResetView
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
@@ -75,7 +76,7 @@ class CustomLoginView(View):
         return render(request, "users/login.html")
 
 
-class CustomLogOutView(View):
+class CustomLogOutView(LoginRequiredMixin, View):
     def get(self, request):
         logout(request)
         messages.success(request, "You Have Successfully Logged Out!")
@@ -86,16 +87,22 @@ class CustomPasswordResetView(PasswordResetView):
     form_class = CustomPasswordResetForm
 
 
-class ProfileView(View):
+class ProfileView(LoginRequiredMixin, View):
     def get(self, request, username):
-        profile = get_object_or_404(CustomUser, username=username)
-        return render(request, "users/profile.html", {"profile": profile})
+        try:
+            profile = get_object_or_404(CustomUser, username=username)
+            return render(request, "users/profile.html", {"profile": profile})
+        except Http404:
+            return HttpResponse(content={"success": False, "error": "profile not found"})
 
 
-class EditProfileView(View):
+class EditProfileView(LoginRequiredMixin, View):
     def get(self, request):
-        user = get_object_or_404(CustomUser, pk=request.user.pk)
-        return render(request, "users/edit_profile.html", {"user": user})
+        try:
+            user = get_object_or_404(CustomUser, pk=request.user.pk)
+            return render(request, "users/edit_profile.html", {"user": user})
+        except Http404:
+            return HttpResponse(content={"success": False, "error": "profile not found"})
 
     def post(self, request):
         user = get_object_or_404(CustomUser, pk=request.user.pk)
@@ -123,7 +130,7 @@ class EditProfileView(View):
         return redirect(reverse("profile_page", kwargs={"username": user.username}))
 
 
-class CustomerAddressView(View):
+class CustomerAddressView(LoginRequiredMixin, View):
     def get(self, request):
         if not CustomerAddress.objects.filter(customer__pk=request.user.pk).exists():
             return render(request, "users/address.html")
@@ -144,10 +151,13 @@ class CustomerAddressView(View):
         return redirect(reverse("profile_page", kwargs={"username": request.user.username}))
 
 
-class CustomerAddressEditView(View):
+class CustomerAddressEditView(LoginRequiredMixin, View):
     def get(self, request):
-        address = get_object_or_404(CustomerAddress, customer__pk=request.user.pk)
-        return render(request, "users/edit_address.html", {"address": address})
+        try:
+            address = get_object_or_404(CustomerAddress, customer__pk=request.user.pk)
+            return render(request, "users/edit_address.html", {"address": address})
+        except Http404:
+            return HttpResponse(content={"success": False, "error": "CustomerAddress not found"})
 
     def post(self, request):
         address = get_object_or_404(CustomerAddress, customer__pk=request.user.pk)

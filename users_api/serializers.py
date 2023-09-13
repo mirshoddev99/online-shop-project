@@ -6,6 +6,8 @@ from rest_framework.generics import get_object_or_404
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import AccessToken
 
+from product_app.models import PaymentCard
+from products_api.serializers import UserSerializer
 from users.email import sending_code
 from users.models import CustomUser, CODE_VERIFIED, CustomerAddress
 
@@ -181,3 +183,22 @@ class CustomerAddressSerializer(serializers.ModelSerializer):
         if not zipcode.isdigit():
             raise ValidationError("You must enter only digits!")
         return zipcode
+
+
+class PaymentCardSerializer(serializers.ModelSerializer):
+    holder_name = serializers.CharField(required=True)
+    card_number = serializers.CharField(required=True, max_length=16)
+    expire_month = serializers.CharField(required=True, max_length=2)
+    cvv = serializers.CharField(required=True, max_length=3)
+    expire_date = serializers.CharField(required=True, max_length=4)
+    owner = UserSerializer(required=False)
+
+    class Meta:
+        model = PaymentCard
+        fields = ['id', 'holder_name', 'card_number', 'expire_month', 'expire_date', 'cvv', 'owner']
+
+    @staticmethod
+    def validate_expire_month(expire_month):
+        if expire_month.isdigit() and int(expire_month) > 12 or int(expire_month) < 1:
+            raise ValidationError("Enter a valid month")
+        return expire_month

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from product_app.models import Product, Category, ProductCart, ProductComment, ProductImage, WishList, SubCategory
+from product_app.models import Product, Category, ProductCart, ProductComment, ProductImage, WishList, SubCategory, \
+    PaymentCard
 
 
 @admin.register(Product)
@@ -40,4 +41,9 @@ class ProductCommentAdmin(admin.ModelAdmin):
 @admin.register(SubCategory)
 class SubCategoryAdmin(admin.ModelAdmin):
     list_display = ['category', 'name']
+
+
+@admin.register(PaymentCard)
+class PaymentCardAdmin(admin.ModelAdmin):
+    list_display = ['id', 'holder_name', 'expire_month', 'expire_date', 'cvv', 'card_number', 'owner']
 

@@ -4,7 +4,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.reverse import reverse
 
-from product_app.models import Product, Category, SubCategory, WishList, ProductCart, ProductComment, ProductImage
+from product_app.models import Product, Category, SubCategory, WishList, ProductCart, ProductComment, ProductImage, \
+    PaymentCard
 from users.models import CustomUser
 
 
